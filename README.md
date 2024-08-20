@@ -3,11 +3,11 @@
 ## Project Overview
 
 This project aims to develop an econometric model to predict the operating costs (`TotalCost`) for various airlines over a 15-year period. By analyzing historical data and employing different statistical methods, the project seeks to identify key factors that influence airline costs and build a reliable predictive model.
-Analysis was performed in R programming language.
+Analysis was performed in R programming language. 
 
 ## Data Source
 
-The dataset used in this analysis includes data from six different airlines, covering a span of 15 years. The key variables in the dataset are:
+The [dataset](https://www.kaggle.com/code/sandhyakrishnan02/econometric-analysis-of-panel-data-using-r)  used in this analysis includes data from six different airlines, covering a span of 15 years. The key variables in the dataset are:
 - **Year**: The year of observation.
 - **AirlineID**: Identifier for each airline.
 - **TotalCost**: The total operating cost incurred by the airline.
