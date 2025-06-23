@@ -4,6 +4,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Tuple
 
+DEFAULT_DATA_PATH = Path(__file__).resolve().parents[1] / "PanelData.csv"
+
 import joblib
 import pandas as pd
 from sklearn.linear_model import LinearRegression
@@ -14,7 +16,7 @@ from .preprocessing import build_preprocessor, load_data, NUMERIC_FEATURES, CATE
 
 @dataclass
 class TrainConfig:
-    data_path: str
+    data_path: Path = DEFAULT_DATA_PATH
     model_path: str = "model.joblib"
     test_size: float = 0.2
     random_state: int = 42

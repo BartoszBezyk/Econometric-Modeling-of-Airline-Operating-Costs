@@ -8,7 +8,7 @@ from sklearn.preprocessing import OneHotEncoder, StandardScaler
 NUMERIC_FEATURES = ["FuelPrice", "LoadFactor", "Output", "Year"]
 CATEGORICAL_FEATURES = ["AirlineID"]
 
-def load_data(csv_path: str) -> pd.DataFrame:
+def load_data(csv_path: str | Path) -> pd.DataFrame:
     """Load dataset from CSV file into a pandas DataFrame."""
     path = Path(csv_path)
     if not path.exists():

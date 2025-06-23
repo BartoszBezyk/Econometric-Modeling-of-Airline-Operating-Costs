@@ -3,6 +3,8 @@
 import argparse
 from pathlib import Path
 
+DEFAULT_DATA_PATH = Path(__file__).with_name("PanelData.csv")
+
 import pandas as pd
 from sklearn.model_selection import train_test_split
 
@@ -14,12 +16,16 @@ from airline_model import stats_tests
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Train and evaluate airline cost model")
-    parser.add_argument("data", help="Path to CSV dataset")
+    parser.add_argument(
+        "--data", default=str(DEFAULT_DATA_PATH), help="Path to CSV dataset"
+    )
     parser.add_argument("--model", default="model.joblib", help="Path to save trained model")
     parser.add_argument("--test-size", type=float, default=0.2, help="Test size fraction")
     args = parser.parse_args()
 
-    config = TrainConfig(data_path=args.data, model_path=args.model, test_size=args.test_size)
+    config = TrainConfig(
+        data_path=Path(args.data), model_path=args.model, test_size=args.test_size
+    )
     model = train_model(config)
 
     df = load_data(args.data)
