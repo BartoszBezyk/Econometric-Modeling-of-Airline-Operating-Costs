@@ -26,7 +26,7 @@ pip install -r requirements.txt
 python run_pipeline.py data.csv --model model.joblib
 ```
 
-The script trains the model, evaluates it on a hold‑out set and prints RMSE and MAPE metrics. The trained model is saved to `model.joblib` by default.
+The script trains the model, evaluates it on a hold-out set and prints RMSE and MAPE metrics. It also reports diagnostic statistics (Shapiro-Wilk, runs, Durbin-Watson, Spearman correlation and residual skewness). The trained model is saved to `model.joblib` by default.
 
 ## Implementation Notes
 

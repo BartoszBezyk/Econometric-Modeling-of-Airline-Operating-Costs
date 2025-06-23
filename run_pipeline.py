@@ -8,8 +8,8 @@ from sklearn.model_selection import train_test_split
 
 from airline_model.training import TrainConfig, train_model, split_features_target
 from airline_model.evaluation import rmse, mape
-from airline_model.inference import load_model
 from airline_model.preprocessing import load_data
+from airline_model import stats_tests
 
 
 def main() -> None:
@@ -33,6 +33,21 @@ def main() -> None:
 
     print(f"RMSE: {rmse(y_true, preds):.4f}")
     print(f"MAPE: {mape(y_true, preds):.2f}%")
+
+    residuals = y_true - preds
+    w, p_w = stats_tests.shapiro_wilk(residuals)
+    print(f"Shapiro-Wilk W: {w:.4f}, p-value: {p_w:.4f}")
+
+    z_run, p_run = stats_tests.runs_test(residuals)
+    print(f"Runs test z: {z_run:.4f}, p-value: {p_run:.4f}")
+
+    dw = stats_tests.durbin_watson(residuals)
+    print(f"Durbin-Watson statistic: {dw:.4f}")
+
+    rho, p_rho = stats_tests.spearman_correlation(preds, residuals)
+    print(f"Spearman rho: {rho:.4f}, p-value: {p_rho:.4f}")
+
+    print(f"Residual skewness: {stats_tests.skewness(residuals):.4f}")
 
 
 if __name__ == "__main__":
