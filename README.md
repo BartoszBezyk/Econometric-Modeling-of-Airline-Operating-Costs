@@ -1,50 +1,65 @@
 # Econometric Modeling of Airline Operating Costs
 
-## Project Overview
+## Overview
 
-This project aims to develop an econometric model to predict the operating costs (`TotalCost`) for various airlines over a 15-year period. By analyzing historical data and employing different statistical methods, the project seeks to identify key factors that influence airline costs and build a reliable predictive model.
-Analysis was performed in R programming language. 
+This repository contains a Python, production-style reimplementation of the original notebook that modelled airline operating costs. The code base keeps the original econometric intent—feature selection with the Information Capacity Index (ICA) and correlation screening, linear modelling under different target transformations, and a comprehensive suite of residual diagnostics—while organising the workflow into reusable modules.
 
-## Data Source
+## Dataset
 
-The [dataset](https://www.kaggle.com/code/sandhyakrishnan02/econometric-analysis-of-panel-data-using-r)  used in this analysis includes data from six different airlines, covering a span of 15 years. The key variables in the dataset are:
-- **Year**: The year of observation.
-- **AirlineID**: Identifier for each airline.
-- **TotalCost**: The total operating cost incurred by the airline.
-- **Output**: Measured in passenger miles, representing the production output of the airline.
-- **FuelPrice**: The price of fuel, a significant component of operating costs.
-- **LoadFactor**: The utilization rate of the airline's fleet, indicating efficiency in passenger space usage.
+PanelData.csv stores six airlines observed annually for fifteen years. The raw column symbols (I, T, C, Q, PF, LF) are mapped to descriptive names (AirlineID, Year, TotalCost, Output, FuelPrice, LoadFactor) during loading. The target variable is TotalCost and the candidate explanatory variables mirror the original study.
 
-## Statistical Methods Used
+## Project Structure
 
-Several statistical methods were employed in this project to develop and refine the econometric models:
+`
+src/
+  config.py                # Shared settings (paths, feature lists, seeds)
+  data_loading.py          # CSV ingestion and column harmonisation
+  preprocessing.py         # Stratified train/test split and X/y extraction
+  feature_selection/
+    information_capacity.py  # ICA scoring and subset ranking
+    correlation_threshold.py # Correlation-based screening variants
+  modeling/
+    regression.py            # Ordinary least squares via scikit-learn
+  evaluation/
+    metrics.py               # Adjusted R^2, AIC, BIC, RMSE, MAE, MAPE
+  diagnostics/
+    residual_tests.py        # Shapiro-Wilk, runs, Durbin-Watson, Spearman, skewness
+  pipeline.py              # End-to-end orchestration utilities (reused programmatically)
+main.py                   # Entry point delegating to the linear workflow
+workflow.py               # Step-by-step pipeline execution with rich logging
+artifacts/                # Generated test-set prediction tables
+`
 
-- **Information Capacity Analysis (ICA)**: A method used to assess the information capacity of different combinations of explanatory variables, helping to identify the most informative sets of variables for model building.
+Each public function includes a docstring describing both intent and relevant statistical background, making it straightforward to extend the project with additional selection methods or model classes.
 
-- **Correlation Coefficient Analysis**: This technique was applied to evaluate the strength and direction of the relationship between the dependent variable (`TotalCost`) and potential explanatory variables. It was used in two rounds to refine the selection of variables.
+## Workflow Summary
 
-- **Data Transformation**: The `TotalCost` variable was transformed using square root and logarithmic functions to stabilize variance and improve the model's predictive accuracy.
+1. **Load & rename** the panel data (src.data_loading).
+2. **Stratified split** per airline to maintain panel balance (src.preprocessing).
+3. **Feature selection** using ICA (top three combinations) and two correlation-threshold strategies (src.feature_selection).
+4. **Model fitting** with scikit-learn linear regression on raw, log-transformed, and square-root-transformed targets (src.modeling).
+5. **Evaluation** via adjusted R^2, AIC, BIC, and test-set R^2/RMSE/MAE/MAPE alongside saved prediction tables (src.evaluation).
+6. **Diagnostics pipeline** covering normality, randomness, autocorrelation, heteroscedasticity, and skewness with human-readable decisions (src.diagnostics).
 
-- **Shapiro-Wilk Test**: A test for normality that was used to verify whether the residuals of the model followed a normal distribution.
+## Running the Workflow
 
-- **Runs Test**: This test was employed to assess the randomness of the residuals, ensuring that they do not exhibit any systematic patterns.
+`
+python workflow.py
+`
 
-- **Durbin-Watson Test**: A test used to detect the presence of autocorrelation in the residuals, which can indicate issues with model specification.
+or equivalently:
 
-- **Spearman Rank Correlation Test**: This test was conducted to check for homoscedasticity, ensuring that the variance of the residuals is consistent across all levels of the fitted values.
+`
+python main.py
+`
 
-## Model Selection
+The script prints a model-comparison table (sorted by AIC), detailed test metrics, residual-diagnostic interpretations, and stores per-model test predictions under rtifacts/.
 
-The final model, `model_ICA1_sqrt`, was selected based on the highest adjusted R-squared value and the lowest AIC and BIC values. The model includes the following variables: `FuelPrice`, `LoadFactor`, `Output`, `AirlineID`, and `Year`.
+## Extending the Project
 
-## Model Evaluation
+- Add new feature selectors by creating modules under src/feature_selection and registering them in pipeline.build_candidate_model_specs.
+- Introduce alternative model families (e.g., regularised regression) by extending src/modeling and updating the pipeline to emit additional ModelSpec entries.
+- Expand diagnostic coverage inside src/diagnostics to keep the downstream reporting automatic.
 
-The model was rigorously tested using several diagnostic tests:
-- **RMSE (Root Mean Square Error)**: 63.3935
-- **MAPE (Mean Absolute Percentage Error)**: 6.472811%
-
-These metrics indicate that the model has a good predictive performance, with the MAPE suggesting an average prediction error of approximately 6.47%.
-
-## Results Summary
-
-The `model_ICA1_sqrt` was identified as the best-performing model, explaining approximately 98.32% of the variance in airline operating costs. The model passed several diagnostic checks, confirming that it meets the assumptions required for a reliable predictive model. The RMSE of 63.3935 and MAPE of 6.472811% indicate that the model is both accurate and robust, making it a valuable tool for forecasting airline costs.
+Dependencies: pandas, 
+umpy, scikit-learn, scipy, and statsmodels.
